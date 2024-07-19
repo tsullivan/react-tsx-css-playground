@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  devtool: 'source-map',
   mode: 'development',
   module: {
     rules: [
@@ -11,6 +12,11 @@ module.exports = {
           loader: 'babel-loader',
         },
       },
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+      }
     ],
   },
   resolve: {

@@ -37,7 +37,7 @@ function debounce<T, U>(func: Function, delay: number): (args: T) => Promise<U> 
         clearTimeout(timeoutId);
       }
       timeoutId = setTimeout(() => {
-        resolve(func.apply(this, args));
+        resolve(func.apply(func, args));
       }, delay);
     });
   };
@@ -51,7 +51,7 @@ const SearchInput = () => {
 
   const debouncedFetchData = debounce<string, string[]>(async (inputValue: string) => suggestUser(inputValue), 400);
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setTerm(inputValue);
 

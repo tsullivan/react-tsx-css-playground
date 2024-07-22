@@ -1,6 +1,8 @@
 import { createRoot } from 'react-dom/client';
 import * as React from 'react';
 
+import './styles.css';
+
 // --------------- API START --------------
 function simulateResponseTime({ min, max }: { min: number; max: number }) {
   return Math.floor(Math.random() * (max - min) + min);

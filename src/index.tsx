@@ -1,7 +1,7 @@
-import { createRoot } from 'react-dom/client';
-import * as React from 'react';
+import { createRoot } from "react-dom/client";
+import * as React from "react";
 
-import './styles.css';
+import "./styles.css";
 
 // --------------- API START --------------
 function simulateResponseTime({ min, max }: { min: number; max: number }) {
@@ -9,31 +9,38 @@ function simulateResponseTime({ min, max }: { min: number; max: number }) {
 }
 
 const mockUsers = [
-  'John Doe',
-  'Jane Smith',
-  'Alex Johnson',
-  'Emily Brown',
-  'Michael Williams',
-  'Sarah Jones',
-  'David Miller',
-  'Emma Davis',
-  'Daniel Garcia',
-  'Olivia Martinez',
+  "John Doe",
+  "Jane Smith",
+  "Alex Johnson",
+  "Emily Brown",
+  "Michael Williams",
+  "Sarah Jones",
+  "David Miller",
+  "Emma Davis",
+  "Daniel Garcia",
+  "Olivia Martinez",
 ];
 
-function suggestUser(str: string): Promise<string[]> {
-  str = str.trim().toLowerCase();
-  return new Promise((resolve) => {
-    window.setTimeout(() => {
-      resolve(mockUsers.filter((u) => u.toLowerCase().includes(str)));
-    }, simulateResponseTime({ min: 350, max: 1350 }));
+function suggestUser(searchTerm: string): Promise<string[]> {
+  searchTerm = searchTerm.trim().toLowerCase();
+  return new Promise((resolve, reject) => {
+    if (searchTerm === "error") {
+      reject(500);
+    } else {
+      window.setTimeout(() => {
+        resolve(mockUsers.filter((u) => u.toLowerCase().includes(searchTerm)));
+      }, simulateResponseTime({ min: 350, max: 1350 }));
+    }
   });
 }
 // ---------------- API END ---------------
 
-function debounce<T, U>(func: Function, delay: number): (args: T) => Promise<U> {
+function debounce<T, U>(
+  func: Function,
+  delay: number
+): (args: T) => Promise<U> {
   let timeoutId: NodeJS.Timeout;
-  return function(...args) {
+  return function (...args) {
     return new Promise((resolve) => {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -50,14 +57,19 @@ const SearchInput = () => {
   const [term, setTerm] = React.useState<string | undefined>();
   const [cache, setCache] = React.useState<Record<string, string[]>>({});
   const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
 
-  const debouncedFetchData = debounce<string, string[]>(async (inputValue: string) => suggestUser(inputValue), 400);
+  const debouncedFetchData = debounce<string, string[]>(
+    async (inputValue: string) => suggestUser(inputValue),
+    400
+  );
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     const inputValue = e.target.value;
     setTerm(inputValue);
 
-    if (inputValue === '') {
+    if (inputValue === "") {
       return;
     }
 
@@ -79,13 +91,17 @@ const SearchInput = () => {
       if (usersData.length > 0) {
         setCache({ ...cache, [inputValue]: usersData });
       }
-    });
+    }).catch(setError);
   };
 
   return (
     <>
       <input list="users" onChange={onChange} placeholder="Search..." />
-      <DataList isLoading={isLoading} term={term} users={users} />
+      {error ? (
+        <p>Search error: {error.toString()}</p>
+      ) : (
+        <DataList isLoading={isLoading} term={term} users={users} />
+      )}
     </>
   );
 };
@@ -102,11 +118,11 @@ const DataList = ({ isLoading, term, users }: DataListProps) => {
   }
 
   if (isLoading) {
-    return <p>{'Loading...Please wait...'}</p>;
+    return <p>{"Loading...Please wait..."}</p>;
   }
 
   if (users.length === 0) {
-    return <p>{'No results'}</p>;
+    return <p>{"No results"}</p>;
   }
 
   return (
@@ -118,6 +134,6 @@ const DataList = ({ isLoading, term, users }: DataListProps) => {
   );
 };
 
-const container = document.getElementById('root')!;
+const container = document.getElementById("root")!;
 const root = createRoot(container);
-root.render(<SearchInput />, );
+root.render(<SearchInput />);

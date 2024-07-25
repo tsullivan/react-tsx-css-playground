@@ -1,9 +1,11 @@
+// {{{ IMPORTS
 import { createRoot } from "react-dom/client";
 import * as React from "react";
-
+import { useState } from "react";
 import "./styles.css";
+// }}}
 
-// --------------- API START --------------
+// {{{ API START
 function simulateResponseTime({ min, max }: { min: number; max: number }) {
   return Math.floor(Math.random() * (max - min) + min);
 }
@@ -33,10 +35,11 @@ function suggestUser(searchTerm: string): Promise<string[]> {
     }
   });
 }
-// ---------------- API END ---------------
+// }}}
 
 function debounce<T, U>(
   func: Function,
+// {{{ DEBOUNCE
   delay: number
 ): (args: T) => Promise<U> {
   let timeoutId: NodeJS.Timeout;
@@ -51,7 +54,9 @@ function debounce<T, U>(
     });
   };
 }
+// }}}
 
+// {{{ SEARCH INPUT
 const SearchInput = () => {
   const [users, setUsers] = React.useState<string[]>([]);
   const [term, setTerm] = React.useState<string | undefined>();
@@ -105,7 +110,9 @@ const SearchInput = () => {
     </>
   );
 };
+// }}}
 
+// {{{ DATALIST
 interface DataListProps {
   isLoading: boolean;
   term: string | undefined;
@@ -133,7 +140,10 @@ const DataList = ({ isLoading, term, users }: DataListProps) => {
     </datalist>
   );
 };
+// }}}
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
 root.render(<SearchInput />);
+
+// vim:fileencoding=utf-8:foldmethod=marker

@@ -1,7 +1,7 @@
 // {{{ IMPORTS
 import { createRoot } from "react-dom/client";
 import * as React from "react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import "./styles.css";
 // }}}
 
@@ -69,9 +69,12 @@ const SearchInput = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const debouncedFetchData = debounce<[string], string[]>(
-    async (inputValue) => suggestUser(inputValue),
-    400
+  const debouncedFetchData = useCallback(
+    debounce<[string], string[]>(
+      async (inputValue) => suggestUser(inputValue),
+      400
+    ),
+    [debounce]
   );
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

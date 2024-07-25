@@ -10,6 +10,11 @@ function simulateResponseTime({ min, max }: { min: number; max: number }) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+function simulateError({ odds, outOf }: { odds: number; outOf: number }) {
+  const rand = Math.floor(Math.random() * outOf);
+  return rand === odds;
+}
+
 const mockUsers = [
   "John Doe",
   "Jane Smith",
@@ -26,7 +31,7 @@ const mockUsers = [
 function suggestUser(searchTerm: string): Promise<string[]> {
   searchTerm = searchTerm.trim().toLowerCase();
   return new Promise((resolve, reject) => {
-    if (searchTerm === "error") {
+    if (simulateError({ odds: 1, outOf: 6 })) {
       reject(500);
     } else {
       window.setTimeout(() => {

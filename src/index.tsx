@@ -37,11 +37,11 @@ function suggestUser(searchTerm: string): Promise<string[]> {
 }
 // }}}
 
-function debounce<T, U>(
-  func: Function,
 // {{{ DEBOUNCE
+function debounce<T extends any[], U>(
+  func: (...args: T) => Promise<U>,
   delay: number
-): (args: T) => Promise<U> {
+): (...args: T) => Promise<U> {
   let timeoutId: NodeJS.Timeout;
   return function (...args) {
     return new Promise((resolve) => {
@@ -58,14 +58,14 @@ function debounce<T, U>(
 
 // {{{ SEARCH INPUT
 const SearchInput = () => {
-  const [users, setUsers] = React.useState<string[]>([]);
-  const [term, setTerm] = React.useState<string | undefined>();
-  const [cache, setCache] = React.useState<Record<string, string[]>>({});
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
+  const [users, setUsers] = useState<string[]>([]);
+  const [term, setTerm] = useState<string | undefined>();
+  const [cache, setCache] = useState<Record<string, string[]>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const debouncedFetchData = debounce<string, string[]>(
-    async (inputValue: string) => suggestUser(inputValue),
+  const debouncedFetchData = debounce<[string], string[]>(
+    async (inputValue) => suggestUser(inputValue),
     400
   );
 
@@ -86,17 +86,19 @@ const SearchInput = () => {
       setIsLoading(false);
     }
 
-    debouncedFetchData(inputValue).then((usersData) => {
-      setIsLoading(false);
+    debouncedFetchData(inputValue)
+      .then((usersData) => {
+        setIsLoading(false);
 
-      if (!resultsFromCache) {
-        setUsers(usersData);
-      }
+        if (!resultsFromCache) {
+          setUsers(usersData);
+        }
 
-      if (usersData.length > 0) {
-        setCache({ ...cache, [inputValue]: usersData });
-      }
-    }).catch(setError);
+        if (usersData.length > 0) {
+          setCache({ ...cache, [inputValue]: usersData });
+        }
+      })
+      .catch(setError);
   };
 
   return (

@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import * as React from "react";
 import { useCallback, useState } from "react";
 import "./styles.css";
+
+require('./flatten');
 // }}}
 
 // {{{ API START
@@ -155,5 +157,6 @@ const DataList = ({ isLoading, term, users }: DataListProps) => {
 const container = document.getElementById("root")!;
 const root = createRoot(container);
 root.render(<SearchInput />);
+
 
 // vim:fileencoding=utf-8:foldmethod=marker
